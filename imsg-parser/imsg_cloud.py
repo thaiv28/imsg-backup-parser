@@ -14,7 +14,7 @@ if __name__ == "__main__":
     nltk.download('stopwords')
     stops = set(stopwords.words('english'))
     sw = ['Replying', 'heic', 'Image', 'PNG', 'jpeg', 'from', 'thaiv', 'esther'
-          ,'u', 'ur', 'tmp', 'gif']
+          ,'u', 'ur', 'tmp', 'gif', 'Loved']
     
     for word in sw:
         stops.add(word)
