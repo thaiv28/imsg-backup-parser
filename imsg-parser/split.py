@@ -15,12 +15,13 @@ class Split():
         for line in file.readlines():
             
             if(str(int(self.year) + 1) in line):
-                self.increment_year()
+                f.close()
+                f = self.increment_year()
             
             if(self.m_ind != 11 and self.year + '-' + self.months[self.m_ind + 1] in line):
                 f.close()
                 f = self.increment_month()
-            
+                
             f.write(line)
             
         f.close()
@@ -30,6 +31,8 @@ class Split():
         self.year = str(int(self.year) + 1)
         print(self.year)    
         self.m_ind = 0
+        f = open(self.path + self.year + '-' + self.months[self.m_ind]+'.txt', 'w')
+        return f
             
     def increment_month(self):
         f = open(self.path + self.year + '-' + self.months[self.m_ind + 1]+'.txt', 'w')
