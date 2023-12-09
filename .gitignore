@@ -6,6 +6,7 @@ __pycache__/
 # project specific
 backup.txt
 texts/
+wordclouds/
 
 # C extensions
 *.so
