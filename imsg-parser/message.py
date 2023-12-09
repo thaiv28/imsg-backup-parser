@@ -1,7 +1,22 @@
 class Message():
     def __init__(self, text):
-        self.meta = text.split('\n')[0].strip()
-        self.text = text.split('\n')[1].strip()
+        s = text.strip().split('\n')
+        if len(s) == 3:
+            self.meta = s[0].strip()
+            self.reply = s[1].strip()
+            self.text = s[2].strip()
+        elif len(s) == 2:
+            self.meta = s[0].strip()
+            self.text = s[1].strip()
+            self.reply = None
+        else:
+            self.meta = s[0].strip()
+            self.text = ''
+            self.reply = None
+            
         
     def __str__(self):
-        return self.meta + '\n' + self.text
+        if self.reply:
+            return self.meta + '\n' + self.reply + '\n' + self.text
+        else:
+            return self.meta + '\n' + self.text

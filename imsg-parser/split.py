@@ -46,6 +46,7 @@ if __name__ == "__main__":
     
     s = Split(month=10, year=2022)
     s.parse_month(file)
+    
     file.close()
     
     
