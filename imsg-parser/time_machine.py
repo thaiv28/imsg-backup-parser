@@ -1,12 +1,14 @@
 import random
 from message import Message
 import argparse
+import datetime
 
 class TimeMachine():
     def __init__(self, text):
         self.text = text
         self.separator = '----------------------------------------------------'
-        self.messages = self.get_messages(text)
+        self.master = self.get_messages(text)
+        self.messages = self.master
         
     
     def random(self):
@@ -97,6 +99,34 @@ class TimeMachine():
             
         return ret
     
+    def dates(self, s=None, e=None):
+        collect = True
+        if s: 
+            start = s.isoformat()
+            collect = False
+        if e: 
+            end = e.isoformat()
+        
+        messages = []
+        
+        for msg in self.master:
+            if start and start in msg.meta:
+                collect = True
+                
+            if end and end in msg.meta:
+                collect = False
+                break
+            
+            if collect:
+                messages.append(msg)
+        
+        self.messages = messages
+    
+    def valid_date(self, start, end):
+        if end < start: 
+            return False
+        return True
+    
 if __name__ == "__main__":
     f = open('../backup.txt', 'r')
     strict = False
@@ -114,22 +144,29 @@ if __name__ == "__main__":
                         help="Search is caps sensitive")
     parser.add_argument('-ct', '--context', nargs='?', default=0, const=10,
                         help="Get context for message.")
+    parser.add_argument('-sd', '--startdate', help="Start date")
+    parser.add_argument('-ed', '--enddate', help="End date")
     args = parser.parse_args()
     
     t = TimeMachine(f.read())
     string = ''
+    
+    if args.startdate or args.enddate:
+        t.dates(datetime.date.fromisoformat(args.startdate), 
+                datetime.date.fromisoformat(args.enddate))
 
     if args.search:
         search_results = t.search(args.search, strict=args.strict, 
                                   caps_sensitive=args.caps)
-        try:
-            if args.rand:
-                msg = search_results[random.randint(0, len(search_results) - 1)]
-            else:
-                msg = search_results[0]
-        except Exception:
+        if len(search_results) == 0:
             print("No messages found")
             exit()
+            
+        if args.rand:
+            msg = search_results[random.randint(0, len(search_results) - 1)]
+        else:
+            msg = search_results[0]
+            
     else:
         msg = t.random()
         
