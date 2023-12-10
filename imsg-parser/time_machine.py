@@ -1,5 +1,6 @@
 import random
 from message import Message
+import argparse
 
 class TimeMachine():
     def __init__(self, text):
@@ -76,15 +77,70 @@ class TimeMachine():
                 return True
         
         return False
+        
+    def get_context(self, msg, scope=10):
+        index = self.messages.index(msg)
+        
+        if index > scope:
+            lower = index - scope
+        else:
+            lower = 0
             
+        if index < len(self.messages) - scope - 1:
+            upper = index + scope
+        else:
+            upper = len(self.messages) - 1
+            
+        ret = []
+        for i in range(lower, upper):
+            ret.append(self.messages[i])
+            
+        return ret
     
 if __name__ == "__main__":
     f = open('../backup.txt', 'r')
+    strict = False
+    caps = False
+    rand = False
+    search = None
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--search", help = "Search for specific term.")
+    parser.add_argument("-r", "--rand", action='store_true',
+                        help="Return random message.")
+    parser.add_argument("-st", "--strict", action='store_true',
+                      help="Search for only standalone word")
+    parser.add_argument("-c", "--caps", action='store_true',
+                        help="Search is caps sensitive")
+    parser.add_argument('-ct', '--context', nargs='?', default=0, const=10,
+                        help="Get context for message.")
+    args = parser.parse_args()
     
     t = TimeMachine(f.read())
-    search = t.search('bagel', strict=False, caps_sensitive=False)
-    for s in search:
-        print(s)
-        print(t.separator)
+    string = ''
+
+    if args.search:
+        search_results = t.search(args.search, strict=args.strict, 
+                                  caps_sensitive=args.caps)
+        try:
+            if args.rand:
+                msg = search_results[random.randint(0, len(search_results) - 1)]
+            else:
+                msg = search_results[0]
+        except Exception:
+            print("No messages found")
+            exit()
+    else:
+        msg = t.random()
+        
+    if args.context != 0:
+        string += t.separator + '\n'  
+        for m in t.get_context(msg):
+            string += t.separator + "\n"
+            string += str(m) + "\n"
+    
+    print(msg)
+    if string: print(string)
     
     f.close()
+    
